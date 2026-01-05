@@ -48,11 +48,11 @@ else:
 MODEL_SAVE_DIR = os.path.join(DRIVE_PATH, 'models')
 os.makedirs(MODEL_SAVE_DIR, exist_ok=True)
 
-# Hyperparameters (Optimized for CPU/Lightweight)
+# Hyperparameters (Optimized for PERFORMANCE)
 SEQUENCE_LENGTH = 1000  # Number of spectral bands
 N_FEATURES = 10         # Number of features per band (e.g., after PCA)
 BATCH_SIZE = 32
-EPOCHS = 30
+EPOCHS = 100            # Increased for better convergence
 LEARNING_RATE = 1e-3
 
 print(f"📂 Working Directory: {DRIVE_PATH}")
@@ -126,11 +126,11 @@ def transformer_encoder_block(inputs, head_size, num_heads, ff_dim, dropout=0):
 
 def build_hyperspectral_transformer(
     input_shape,
-    d_model=32,
-    num_heads=2,
-    ff_dim=128,
-    num_transformer_blocks=2,
-    mlp_units=[32],
+    d_model=64,             # INCREASED: More capacity
+    num_heads=4,            # INCREASED: Focus on different parts of spectrum
+    ff_dim=256,             # INCREASED: Wider internal layers
+    num_transformer_blocks=4, # DOUBLED: Deeper network
+    mlp_units=[128, 64],    # DEEPER: Stronger regressor head
     dropout=0.1,
     mlp_dropout=0.2,
 ):
