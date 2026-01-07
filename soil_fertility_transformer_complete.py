@@ -16,6 +16,7 @@ from tensorflow import keras
 from tensorflow.keras import layers
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import math
 
 # Try to mount drive, but handle failure gracefully (for local testing)
 try:
@@ -290,7 +291,6 @@ print("📈 EVALUATION")
 print("="*80)
 
 Y_pred_scaled = model.predict(X_val_scaled, verbose=0)
-Y_pred = scaler_Y.inverse_transform(Y_pred_scaled)
 
 mae = mean_absolute_error(Y_val, Y_pred)
 r2 = r2_score(Y_val, Y_pred)
@@ -323,6 +323,30 @@ viz_path = os.path.join(MODEL_SAVE_DIR, 'results_plot.png')
 plt.savefig(viz_path)
 print(f"📊 Plot saved to: {viz_path}")
 plt.show()
+
+# Save Quantitative Report
+report_path = os.path.join(MODEL_SAVE_DIR, 'evaluation_metrics.txt')
+rmse = np.sqrt(mean_squared_error(Y_val, Y_pred))
+
+with open(report_path, 'w') as f:
+    f.write("SOIL FERTILITY PREDICTION - QUANTITATIVE RESULTS\n")
+    f.write("================================================\n")
+    f.write(f"Model Architecture: Transformer (d_model={model.layers[1].output.shape[-1]})\n")
+    f.write(f"Test Set Size:      {len(Y_val)} samples\n\n")
+    f.write("EVALUATION METRICS:\n")
+    f.write(f"-------------------\n")
+    f.write(f"R² Score (Accuracy): {r2:.4f} ({r2*100:.2f}%)\n")
+    f.write(f"MAE (Mean Abs Error): {mae:.4f}\n")
+    f.write(f"RMSE (Rt Mean Sq Err):{rmse:.4f}\n")
+    f.write("\nINTERPRETATION:\n")
+    if r2 > 0.75:
+        f.write("- The model shows strong predictive performance (R² > 0.75).\n")
+    elif r2 > 0.5:
+        f.write("- The model shows moderate predictive performance.\n")
+    else:
+        f.write("- The model performance suggests further optimization is needed.\n")
+
+print(f"📄 Quantitative Report saved to: {report_path}")
 
 # =============================================================================
 # 5. SAVING & VERIFICATION (CRITICAL STEP)
